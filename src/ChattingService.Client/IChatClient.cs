@@ -1,6 +1,6 @@
-﻿using ChattingService.Models;
+﻿using ChattingService.Shared.Models;
 
-namespace ChattingService;
+namespace ChattingService.Client;
 
 public interface IChatClient : IDisposable
 {

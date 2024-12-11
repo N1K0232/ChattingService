@@ -1,12 +1,13 @@
-﻿using ChattingService.Models;
+﻿using ChattingService.Shared.Models;
+using Microsoft.Extensions.Logging;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 
-namespace ChattingService;
+namespace ChattingService.Server;
 
-public class ChatServer(ChatSettings options) : IChatServer
+public class ChatServer(ChatServerOptions options, ILogger<ChatServer> logger) : IChatServer
 {
     private TcpListener listener = new(IPAddress.Any, options.Port);
     private IList<TcpClient> clients = [];
@@ -19,11 +20,11 @@ public class ChatServer(ChatSettings options) : IChatServer
         int clientCount = 0;
 
         listener.Start();
-        Console.WriteLine("Server started listening");
+        logger.LogInformation("Server started listening");
 
         while (clientCount < options.MaxClientsCount)
         {
-            var client = await listener.AcceptTcpClientAsync();
+            TcpClient client = await listener.AcceptTcpClientAsync();
             lock (clients)
             {
                 clients.Add(client);
@@ -79,10 +80,10 @@ public class ChatServer(ChatSettings options) : IChatServer
         {
             while (client.Connected)
             {
-                int bytesRead = await stream.ReadAsync(buffer, 0, buffer.Length);
-                if (bytesRead > 0)
+                int read = await stream.ReadAsync(buffer, 0, buffer.Length);
+                if (read > 0)
                 {
-                    string json = Encoding.UTF8.GetString(buffer, 0, bytesRead);
+                    string json = Encoding.UTF8.GetString(buffer, 0, read);
                     var message = JsonSerializer.Deserialize<ChatMessage>(json)!;
 
                     await BroadcastMessageAsync(message, cancellationToken);

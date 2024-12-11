@@ -1,6 +1,6 @@
-﻿namespace ChattingService;
+﻿namespace ChattingService.Server;
 
-public class ChatSettings
+public class ChatServerOptions
 {
     public int Port { get; set; }
 

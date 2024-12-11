@@ -1,22 +1,17 @@
-﻿using ChattingService;
-using ChattingService.Models;
+﻿using ChattingService.Client;
+using ChattingService.Shared.Models;
 
 namespace ChattingServiceConsoleAppSample;
 
 public class Application
 {
-    public async Task ExecuteAsync()
+    public async Task RunAsync()
     {
-        Console.WriteLine("Connecting . . .");
-
-        using var primaryClient = new ChatClient();
-        await primaryClient.ConnectAsync("127.0.0.1", 5000);
-
-        using var secondaryClient = new ChatClient();
-        await secondaryClient.ConnectAsync("127.0.0.1", 5000);
-
         Console.Write("Type your message: ");
         string? text = Console.ReadLine();
+
+        using var client = new ChatClient();
+        await client.ConnectAsync("127.0.0.1", 5000);
 
         if (string.IsNullOrWhiteSpace(text))
         {
@@ -30,11 +25,11 @@ public class Application
             RecipientId = Guid.NewGuid()
         };
 
-        await primaryClient.SendAsync(message);
-        await secondaryClient.ReceiveAsync(SecondaryClientReceivedAsync);
+        await client.SendAsync(message);
+        await client.ReceiveAsync(MessageReceivedAsync);
     }
 
-    private async Task SecondaryClientReceivedAsync(ChatMessage message, CancellationToken cancellationToken)
+    private async Task MessageReceivedAsync(ChatMessage message, CancellationToken cancellationToken)
     {
         await Task.Delay(500, cancellationToken);
         string responseMessage = string.Format("Message received: {0}", message.Text);

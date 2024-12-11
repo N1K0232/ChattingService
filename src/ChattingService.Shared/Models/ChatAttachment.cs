@@ -1,4 +1,4 @@
-﻿namespace ChattingService.Models;
+﻿namespace ChattingService.Shared.Models;
 
 public class ChatAttachment
 {

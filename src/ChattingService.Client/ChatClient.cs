@@ -1,9 +1,9 @@
-﻿using ChattingService.Models;
+﻿using ChattingService.Shared.Models;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.Json;
 
-namespace ChattingService;
+namespace ChattingService.Client;
 
 public class ChatClient : IChatClient
 {
